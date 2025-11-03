@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chat APP</title>
+    <title>Socket APP</title>
   </head>
   <body>
-    <h1>Chatting</h1>
+    <h1>Socket Programming</h1>
 
     <input type="text" id="message" placeholder="Enter Message" />
     <button id="sendBtn">Send</button>
@@ -16,21 +16,30 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
+      async function encrypt(text) {
+        return btoa(text);
+      }
+
+      async function decrypt(text) {
+        return atob(text);
+      }
       const socket = io();
       const sendBtn = document.getElementById("sendBtn");
       const messageInput = document.getElementById("message");
       const allMessages = document.getElementById("messages");
 
-      socket.on("message", (message) => {
+      socket.on("message", async (encryptedMsg) => {
+        const message = await decrypt(encryptedMsg);
         const p = document.createElement("p");
         p.innerText = message;
         allMessages.appendChild(p);
       });
 
-      sendBtn.addEventListener("click", (e) => {
+      sendBtn.addEventListener("click", async () => {
         const message = messageInput.value;
         console.log(message);
-        socket.emit("user-message", message);
+        const encrypted = await encrypt(message);
+        socket.emit("user-message", encrypted);
       });
     </script>
   </body>
